@@ -1,5 +1,10 @@
 # Viamlabs - Remote Control
 
+> [!NOTE]  
+> Turtlebot runs on a different port -> 8081
+> probably have to change SSL settings for local connect
+
+
 A demo application using the Viam Flutter SDK to connect to a robot and provide remote control capabilities such as moving the base while monitoring the environment through the camera.
 
 ![Flutter App Screenshot](./media/viamlabs-remote-control.jpeg)
