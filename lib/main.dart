@@ -100,23 +100,25 @@ class MyHomePage extends StatelessWidget {
         title: const Text('Viamlabs Remote Control'),
       ),
       body: SafeArea(
-          bottom: false,
-          child: SingleChildScrollView(
-            child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  !appState._isLoggedIn
-                      ? const LoginPage()
-                      : appState._isLoading
-                          ? Center(child: PlatformCircularProgressIndicator())
-                          : ViamBaseScreen(
-                              base: appState._base,
-                              cameras: appState._cameras,
-                              robotClient: appState._robot,
-                            ),
-                ]),
-          )),
+        bottom: false,
+        child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Flexible(
+                child: !appState._isLoggedIn
+                    ? const LoginPage()
+                    : appState._isLoading
+                        ? Center(child: PlatformCircularProgressIndicator())
+                        : ViamBaseScreen(
+                            base: appState._base,
+                            cameras: appState._cameras,
+                            robotClient: appState._robot,
+                          ),
+              )
+            ]),
+      ),
       floatingActionButton: appState._isLoggedIn
           ? FloatingActionButton(
               onPressed: () {
