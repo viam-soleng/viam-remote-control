@@ -111,7 +111,7 @@ class MyHomePage extends StatelessWidget {
                     ? const LoginPage()
                     : appState._isLoading
                         ? Center(child: PlatformCircularProgressIndicator())
-                        : ViamBaseScreen(
+                        : ViamBaseWidget(
                             base: appState._base,
                             cameras: appState._cameras,
                             robotClient: appState._robot,
