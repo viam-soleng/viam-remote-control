@@ -47,5 +47,11 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>Viam requires access to your devices local network to connect to your devices.</string>
+	<key>NSBonjourServices</key>
+	<array>
+    	<string>_rpc._tcp</string>
+	</array>
 </dict>
 </plist>
