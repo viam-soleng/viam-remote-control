@@ -30,10 +30,9 @@ class MyApp extends StatelessWidget {
   }
 }
 
+/// Application state plus login / logout methods
+///
 class MyAppState extends ChangeNotifier {
-  var webRTC = false;
-  final dialOptions = DialOptions();
-  late Future robotFut;
   var _isLoggedIn = false;
   var _isLoading = false;
   late RobotClient _robot;
@@ -41,11 +40,12 @@ class MyAppState extends ChangeNotifier {
   late Base _base;
   late Iterable<Camera> _cameras;
 
-  void login(String location, String secret) {
+  void login(String location, String apiKeyID, String apiKey) {
     _isLoggedIn = true;
     _isLoading = true;
     notifyListeners();
 
+/*
     if (!webRTC) {
       dialOptions.insecure = true;
       dialOptions.authEntity = 'pi-main.t7do9d9645.viam.cloud';
@@ -53,22 +53,19 @@ class MyAppState extends ChangeNotifier {
       dialOptions.webRtcOptions!.disable = true;
     }
     dialOptions.credentials = Credentials.locationSecret(secret);
-    /*
-    else {
-      robotFut = RobotClient.atAddress(
-        location,
-        RobotClientOptions.withLocationSecret(secret),
-      );
-    }*/
-    robotFut = RobotClient.atAddress(
-        location, RobotClientOptions.withDialOptions(dialOptions));
+*/
+    final robotFut = RobotClient.atAddress(
+      location,
+      RobotClientOptions.withApiKey(apiKeyID, apiKey),
+    );
+
     robotFut.then((value) {
       _robot = value;
-
+      // Get the robots base component
       var baseName = _robot.resourceNames.firstWhere(
           (element) => element.subtype == Base.subtype.resourceSubtype);
       _base = Base.fromRobot(_robot, baseName.name);
-
+      // Get the robots cameras, there can be multiple!
       _cameras = _robot.resourceNames
           .where((element) => element.subtype == Camera.subtype.resourceSubtype)
           .map((e) => Camera.fromRobot(_robot, e.name));
@@ -87,6 +84,8 @@ class MyAppState extends ChangeNotifier {
   }
 }
 
+/// Main application widget including UI logic
+///
 class MyHomePage extends StatelessWidget {
   const MyHomePage({super.key});
 
@@ -100,25 +99,23 @@ class MyHomePage extends StatelessWidget {
         title: const Text('Viamlabs Remote Control'),
       ),
       body: SafeArea(
-        bottom: false,
-        child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Flexible(
-                child: !appState._isLoggedIn
-                    ? const LoginPage()
-                    : appState._isLoading
-                        ? Center(child: PlatformCircularProgressIndicator())
-                        : ViamBaseWidget(
-                            base: appState._base,
-                            cameras: appState._cameras,
-                            robotClient: appState._robot,
-                          ),
-              )
-            ]),
-      ),
+          bottom: false,
+          child: SingleChildScrollView(
+            child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  !appState._isLoggedIn
+                      ? const LoginPage()
+                      : appState._isLoading
+                          ? Center(child: PlatformCircularProgressIndicator())
+                          : ViamBaseWidget(
+                              base: appState._base,
+                              cameras: appState._cameras,
+                              robotClient: appState._robot,
+                            ),
+                ]),
+          )),
       floatingActionButton: appState._isLoggedIn
           ? FloatingActionButton(
               onPressed: () {
@@ -132,6 +129,8 @@ class MyHomePage extends StatelessWidget {
   }
 }
 
+/// The login widget section consists of the widget and its state
+///
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
@@ -143,12 +142,14 @@ class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   final locationController =
       TextEditingController(text: dotenv.env['LOCATION']);
-  final secretController = TextEditingController(text: dotenv.env['SECRET']);
+  final keyIDController = TextEditingController(text: dotenv.env['KEYID']);
+  final keyController = TextEditingController(text: dotenv.env['KEY']);
 
   @override
   void dispose() {
     locationController.dispose();
-    secretController.dispose();
+    keyIDController.dispose();
+    keyController.dispose();
     super.dispose();
   }
 
@@ -179,15 +180,32 @@ class _LoginPageState extends State<LoginPage> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
               child: TextFormField(
-                controller: secretController,
+                controller: keyIDController,
                 obscureText: true,
                 decoration: const InputDecoration(
                   border: OutlineInputBorder(),
-                  labelText: 'Location Secret',
+                  labelText: 'API Key ID',
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter the location secret!';
+                    return 'Please enter the api key id!';
+                  }
+                  return null;
+                },
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+              child: TextFormField(
+                controller: keyController,
+                obscureText: true,
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: 'API Key',
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter the api key!';
                   }
                   return null;
                 },
@@ -197,8 +215,8 @@ class _LoginPageState extends State<LoginPage> {
               child: ElevatedButton(
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
-                    appState.login(
-                        locationController.text, secretController.text);
+                    appState.login(locationController.text,
+                        keyIDController.text, keyController.text);
                   }
                 },
                 child: const Text('Login'),
