@@ -45,15 +45,14 @@ class MyAppState extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
 
-    //dialOptions.insecure = true;
-    //dialOptions.authEntity = 'pi-main.t7do9d9645.viam.cloud';
-    //dialOptions.webRtcOptions = DialWebRtcOptions();
-    //dialOptions.webRtcOptions!.disable = true;
-    //dialOptions.credentials = Credentials.locationSecret(secret);
-    //dialOptions.attemptMdns = true;
     RobotClientOptions options =
         RobotClientOptions.withApiKey(apiKeyID, apiKey);
-    //options.dialOptions.attemptMdns = true;
+    options.dialOptions.attemptMdns = false;
+    //options.insecure = true;
+    //options.authEntity = 'pi-main.t7do9d9645.viam.cloud';
+    //options.webRtcOptions = DialWebRtcOptions();
+    //options.webRtcOptions!.disable = true;
+    //options.credentials = Credentials.locationSecret(secret);
 
     Future<RobotClient> robotFut = RobotClient.atAddress(location, options);
 
