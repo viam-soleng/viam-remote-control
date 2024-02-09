@@ -1,7 +1,7 @@
 # Viamlabs - Remote Control
 
 > [!NOTE]  
-> This is repo is outdated and in the meantime we have added a full tutorial on how to build a Viam mobile app. You can find it [here](https://docs.viam.com/tutorials/control/flutter-app/)
+> This is repo is outdated and in the meantime we have added a full tutorial on how to build a Viam mobile app. You can find it [here](https://docs.viam.com/tutorials/control/flutter-app/).
 
 <img align="right" src="./media/viamlabs-remote-control.png" alt="iPhone Control Screen">
 
